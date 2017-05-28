@@ -19,7 +19,8 @@ import math
 #
 # cos d = (siny1)×(siny2) + (cosy1)×(cosy2)×cos(x1－x2)
 # (緯度=lat, 経度=lng)
-def get_distance(lat1, lng1, lat2, lng2):
+# @profile
+def get_simple_distance(lat1, lng1, lat2, lng2):
     # 地球の半径を赤道半径と仮定する
     r = 6378.137
     # 角度をradianに変換
@@ -33,7 +34,8 @@ def get_distance(lat1, lng1, lat2, lng2):
 #
 # 方位角は北：:0度、東：90度、南：180度、西-90度で表示。
 # 方位角=90-atan2(sin(x2-x1),cos(y1)tan(y2)-sin(y1)cos(x2-x1))
-def get_direction(lat1, lng1, lat2, lng2):
+# @profile
+def get_simple_direction(lat1, lng1, lat2, lng2):
     # 角度をradianに変換
     lat1 = lat1 * math.pi / 180
     lng1 = lng1 * math.pi / 180
@@ -42,8 +44,15 @@ def get_direction(lat1, lng1, lat2, lng2):
     atan = math.atan2(math.sin(lng2 - lng1), math.cos(lat1) * math.tan(lat2) - math.sin(lat1) * math.cos(lng2 - lng1))
     return atan * 180 / math.pi # radianから角度に戻す
 
-distance = get_distance(36, 150, 44, 141)
-direction = get_direction(36, 150, 44, 141)
+import timeit
 
-print distance
-print direction
+# timeit.timeit('get_distance(36, 150, 44, 141)', number=10)
+
+if __name__ == '__main__':
+    import timeit
+    print(timeit.timeit("get_simple_distance(36, 150, 44, 141)", number=100, setup="from __main__ import get_simple_distance"))
+    print(timeit.timeit("get_simple_direction(36, 150, 44, 141)", number=100, setup="from __main__ import get_simple_direction"))
+    distance = get_simple_distance(36, 150, 44, 141)
+    direction = get_simple_direction(36, 150, 44, 141)
+    print "distance: {}".format(distance)
+    print "direction: {}".format(direction)
