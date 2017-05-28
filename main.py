@@ -44,11 +44,25 @@ def get_simple_direction(lat1, lng1, lat2, lng2):
     atan = math.atan2(math.sin(lng2 - lng1), math.cos(lat1) * math.tan(lat2) - math.sin(lat1) * math.cos(lng2 - lng1))
     return atan * 180 / math.pi # radianから角度に戻す
 
+#
+# TODO 地球を楕円体として距離を求める
+#
+# see: http://vldb.gsi.go.jp/sokuchi/surveycalc/surveycalc/algorithm/bl2st/bl2st.htm
+def get_accurate_distance(lat1, lng1, lat2, lng2):
+    pass
+
+#
+# TODO 地球を楕円体として方角を求める
+#
+# see: http://vldb.gsi.go.jp/sokuchi/surveycalc/surveycalc/algorithm/bl2st/bl2st.htm
+def get_acurate_direction(lat1, lng1, lat2, lng2):
+    pass
+
 # main
 if __name__ == '__main__':
     import timeit
-    print(timeit.timeit("get_simple_distance(36, 150, 44, 141)", number=100, setup="from __main__ import get_simple_distance"))
-    print(timeit.timeit("get_simple_direction(36, 150, 44, 141)", number=100, setup="from __main__ import get_simple_direction"))
+    # print(timeit.timeit("get_simple_distance(36, 150, 44, 141)", number=100, setup="from __main__ import get_simple_distance"))
+    # print(timeit.timeit("get_simple_direction(36, 150, 44, 141)", number=100, setup="from __main__ import get_simple_direction"))
     distance = get_simple_distance(36, 150, 44, 141)
     direction = get_simple_direction(36, 150, 44, 141)
     print "distance: {}".format(distance)
