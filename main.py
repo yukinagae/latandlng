@@ -72,18 +72,89 @@ def get_simple_direction(lat1, lng1, lat2, lng2):
 def get_accurate_distance(lat1, lng1, lat2, lng2):
     pass
 
+def get_ll(l):
+    if l > 180:
+        return l - 360
+    elif l < -180:
+        return l + 360
+    else:
+        return l
+
+def get_delta(phi1, phi2, ll):
+    if ll >= 0:
+        return phi2 - phi1
+    else:
+        return phi1 - phi2
+
+def get_u1(phi1, phi2, ll, f):
+    if ll >= 0:
+        return math.atan((1 - f) * math.tan(phi1))
+    else:
+        return math.atan((1 - f) * math.tan(phi2))
+
+def get_u2(phi1, phi2, ll, f):
+    if ll >= 0:
+        return math.atan((1 - f) * math.tan(phi2))
+    else:
+        return math.atan((1 - f) * math.tan(phi1))
+
+
 #
 # TODO 地球を楕円体として方角を求める
 #
 def get_acurate_direction(lat1, lng1, lat2, lng2):
-    pass
+    phi1 = lat1
+    L1 = lng1
+    phi2 = lat2
+    L2 = lng2
+    a = 6378137 # 長半径
+    f = 1/298.257222101 # 扁平率
+    l = L2 - L1
+    ll = get_ll(l)
+    L = math.fabs(ll)
+    LL = 180 - L
+    delta = get_delta(phi1, phi2, ll)
+    sigma = phi1 + phi2
+    u1 = get_u1(phi1, phi2, ll, f)
+    u2= get_u1(phi1, phi2, ll, f)
+    sigmasigma = u1 + u2
+    deltadelta = u2 - u1
+    Z = math.cos(sigmasigma/2)
+    ZZ = math.sin(sigmasigma/2)
+    E = math.sin(deltadelta/2)
+    EE = math.cos(deltadelta/2)
+    x = math.sin(u1) * math.sin(u2)
+    y = math.cos(u1) * math.cos(u2)
+    c = y * math.cos(L) + x
+    e = (f * (2 - f)) / math.pow((1 - f), 2)
+    # zone 1
+    theta = L * (1 + f * y)
+    print theta
+    for n in range(0, 100):
+        g = math.sqrt(math.pow(E, 2) * math.pow(math.cos(theta/2), 2) + math.pow(Z, 2) * math.pow(math.sin(theta/2), 2))
+        h = math.sqrt(math.pow(EE, 2) * math.pow(math.cos(theta/2), 2) + math.pow(ZZ, 2) * math.pow(math.sin(theta/2), 2))
+        o = 2 * math.atan(g/h)
+        J = 2 * g * h
+        K = math.pow(h, 2) - math.pow(g, 2)
+        r = y * math.sin(theta) / J
+        R = 1 - math.pow(y, 2)
+        S = R * K - 2 * x
+        SS = S + x
+        D = 1 / 4 * f * (1 + f) - 3 / 16 * math.pow(f, 2) * R
+        E1 = (1 - D * R) * f * y * (o + D * J * (S + D * K * ((2 * math.pow(S, 2) - math.pow(R, 2)))))
+        F = theta - L - E1
+        G = f * math.pow(y, 2) * (1 - 2 * D * R) + f * SS * (o / J) * (1 - D * R + 1/2 * f * math.pow(y, 2))
+        print G
+        theta = theta - F / (1 - G)
+    print theta
+
 
 # main
 if __name__ == '__main__':
     import timeit
     # print(timeit.timeit("get_simple_distance(36, 150, 44, 141)", number=100, setup="from __main__ import get_simple_distance"))
     # print(timeit.timeit("get_simple_direction(36, 150, 44, 141)", number=100, setup="from __main__ import get_simple_direction"))
-    distance = get_simple_distance(36, 150, 44, 141)
-    direction = get_simple_direction(36, 150, 44, 141)
-    print "distance: {}".format(distance)   # distance: 1174.15250957
+    # distance = get_simple_distance(36, 150, 44, 141)
+    direction = get_acurate_direction(36, 150, 44, 141)
+    # print "distance: {}".format(distance)   # distance: 1174.15250957
     print "direction: {}".format(direction) # direction: 322.066953861
