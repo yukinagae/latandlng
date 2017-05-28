@@ -146,7 +146,10 @@ def get_acurate_direction(lat1, lng1, lat2, lng2):
         G = f * math.pow(y, 2) * (1 - 2 * D * Γ) + f * ζζ * (σ / J) * (1 - D * Γ + 1/2 * f * math.pow(y, 2))
         print(G)
         θ = θ - F / (1 - G)
-    print(θ)
+    α = math.atan(math.fabs(ξ * math.tan(θ/2) / η))
+    Δα_2 = math.atan(math.fabs(ξ * math.tan(θ/2) / ηη))
+    αα = α
+    αα1 = αα - Δα_2
 
 
 # main
