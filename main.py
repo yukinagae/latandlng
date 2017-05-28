@@ -80,32 +80,32 @@ def get_ll(l):
     else:
         return l
 
-def get_delta(phi1, phi2, ll):
+def get_delta(φ1, φ2, ll):
     if ll >= 0:
-        return phi2 - phi1
+        return φ2 - φ1
     else:
-        return phi1 - phi2
+        return φ1 - φ2
 
-def get_u1(phi1, phi2, ll, f):
+def get_u1(φ1, φ2, ll, f):
     if ll >= 0:
-        return math.atan((1 - f) * math.tan(phi1))
+        return math.atan((1 - f) * math.tan(φ1))
     else:
-        return math.atan((1 - f) * math.tan(phi2))
+        return math.atan((1 - f) * math.tan(φ2))
 
-def get_u2(phi1, phi2, ll, f):
+def get_u2(φ1, φ2, ll, f):
     if ll >= 0:
-        return math.atan((1 - f) * math.tan(phi2))
+        return math.atan((1 - f) * math.tan(φ2))
     else:
-        return math.atan((1 - f) * math.tan(phi1))
+        return math.atan((1 - f) * math.tan(φ1))
 
 
 #
 # TODO 地球を楕円体として方角を求める
 #
 def get_acurate_direction(lat1, lng1, lat2, lng2):
-    phi1 = lat1
+    φ1 = lat1
     L1 = lng1
-    phi2 = lat2
+    φ2 = lat2
     L2 = lng2
     a = 6378137 # 長半径
     f = 1/298.257222101 # 扁平率
@@ -113,40 +113,40 @@ def get_acurate_direction(lat1, lng1, lat2, lng2):
     ll = get_ll(l)
     L = math.fabs(ll)
     LL = 180 - L
-    delta = get_delta(phi1, phi2, ll)
-    sigma = phi1 + phi2
-    u1 = get_u1(phi1, phi2, ll, f)
-    u2= get_u1(phi1, phi2, ll, f)
-    sigmasigma = u1 + u2
-    deltadelta = u2 - u1
-    Z = math.cos(sigmasigma/2)
-    ZZ = math.sin(sigmasigma/2)
-    E = math.sin(deltadelta/2)
-    EE = math.cos(deltadelta/2)
+    Δ = get_delta(φ1, φ2, ll)
+    Σ = φ1 + φ2
+    u1 = get_u1(φ1, φ2, ll, f)
+    u2= get_u1(φ1, φ2, ll, f)
+    ΣΣ = u1 + u2
+    ΔΔ = u2 - u1
+    ξ = math.cos(ΣΣ/2)
+    ξξ = math.sin(ΣΣ/2)
+    η = math.sin(ΔΔ/2)
+    ηη = math.cos(ΔΔ/2)
     x = math.sin(u1) * math.sin(u2)
     y = math.cos(u1) * math.cos(u2)
     c = y * math.cos(L) + x
-    e = (f * (2 - f)) / math.pow((1 - f), 2)
+    ε = (f * (2 - f)) / math.pow((1 - f), 2)
     # zone 1
-    theta = L * (1 + f * y)
-    print theta
+    θ = L * (1 + f * y)
+    print(θ)
     for n in range(0, 100):
-        g = math.sqrt(math.pow(E, 2) * math.pow(math.cos(theta/2), 2) + math.pow(Z, 2) * math.pow(math.sin(theta/2), 2))
-        h = math.sqrt(math.pow(EE, 2) * math.pow(math.cos(theta/2), 2) + math.pow(ZZ, 2) * math.pow(math.sin(theta/2), 2))
-        o = 2 * math.atan(g/h)
+        g = math.sqrt(math.pow(η, 2) * math.pow(math.cos(θ/2), 2) + math.pow(ξ, 2) * math.pow(math.sin(θ/2), 2))
+        h = math.sqrt(math.pow(ηη, 2) * math.pow(math.cos(θ/2), 2) + math.pow(ξξ, 2) * math.pow(math.sin(θ/2), 2))
+        σ = 2 * math.atan(g/h)
         J = 2 * g * h
         K = math.pow(h, 2) - math.pow(g, 2)
-        r = y * math.sin(theta) / J
-        R = 1 - math.pow(y, 2)
-        S = R * K - 2 * x
-        SS = S + x
-        D = 1 / 4 * f * (1 + f) - 3 / 16 * math.pow(f, 2) * R
-        E1 = (1 - D * R) * f * y * (o + D * J * (S + D * K * ((2 * math.pow(S, 2) - math.pow(R, 2)))))
-        F = theta - L - E1
-        G = f * math.pow(y, 2) * (1 - 2 * D * R) + f * SS * (o / J) * (1 - D * R + 1/2 * f * math.pow(y, 2))
-        print G
-        theta = theta - F / (1 - G)
-    print theta
+        r = y * math.sin(θ) / J
+        Γ = 1 - math.pow(y, 2)
+        ζ = Γ * K - 2 * x
+        ζζ = ζ + x
+        D = 1 / 4 * f * (1 + f) - 3 / 16 * math.pow(f, 2) * Γ
+        E = (1 - D * Γ) * f * y * (σ + D * J * (ζ + D * K * ((2 * math.pow(ζ, 2) - math.pow(Γ, 2)))))
+        F = θ - L - E
+        G = f * math.pow(y, 2) * (1 - 2 * D * Γ) + f * ζζ * (σ / J) * (1 - D * Γ + 1/2 * f * math.pow(y, 2))
+        print(G)
+        θ = θ - F / (1 - G)
+    print(θ)
 
 
 # main
@@ -157,4 +157,4 @@ if __name__ == '__main__':
     # distance = get_simple_distance(36, 150, 44, 141)
     direction = get_acurate_direction(36, 150, 44, 141)
     # print "distance: {}".format(distance)   # distance: 1174.15250957
-    print "direction: {}".format(direction) # direction: 322.066953861
+    print("direction: {}".format(direction)) # direction: 322.066953861

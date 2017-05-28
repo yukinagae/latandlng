@@ -8,7 +8,7 @@ TODO
 
 ### Setup ###
 
-* python2.7.13
+* python3.6.0
 
 ### How to Run ###
 
