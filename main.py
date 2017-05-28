@@ -44,10 +44,7 @@ def get_simple_direction(lat1, lng1, lat2, lng2):
     atan = math.atan2(math.sin(lng2 - lng1), math.cos(lat1) * math.tan(lat2) - math.sin(lat1) * math.cos(lng2 - lng1))
     return atan * 180 / math.pi # radianから角度に戻す
 
-import timeit
-
-# timeit.timeit('get_distance(36, 150, 44, 141)', number=10)
-
+# main
 if __name__ == '__main__':
     import timeit
     print(timeit.timeit("get_simple_distance(36, 150, 44, 141)", number=100, setup="from __main__ import get_simple_distance"))
