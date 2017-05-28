@@ -20,6 +20,7 @@ import math
 # cos d = (siny1)×(siny2) + (cosy1)×(cosy2)×cos(x1－x2)
 # (緯度=lat, 経度=lng)
 # @profile
+# TODO 緯度、経度が180を超えた場合の考慮が抜けている。（その場合には、マイナスにして計算する必要がある）
 def get_simple_distance(lat1, lng1, lat2, lng2):
     # 地球の半径を赤道半径と仮定する
     r = 6378.137
@@ -35,6 +36,7 @@ def get_simple_distance(lat1, lng1, lat2, lng2):
 # 方位角は北：:0度、東：90度、南：180度、西-90度で表示。
 # 方位角=90-atan2(sin(x2-x1),cos(y1)tan(y2)-sin(y1)cos(x2-x1))
 # @profile
+# TODO 緯度、経度が180を超えた場合の考慮が抜けている。（その場合には、マイナスにして計算する必要がある）
 def get_simple_direction(lat1, lng1, lat2, lng2):
     # 角度をradianに変換
     lat1 = lat1 * math.pi / 180
