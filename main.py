@@ -33,7 +33,7 @@ def get_simple_distance(lat1, lng1, lat2, lng2):
 
 # 2点の(緯度, 経度)から方角を計算する(北=0)
 #
-# 方位角は北：:0度、東：90度、南：180度、西-90度で表示。
+# 方位角は北：:0度、東：90度、南：180度、西270度で表示。
 # 方位角=90-atan2(sin(x2-x1),cos(y1)tan(y2)-sin(y1)cos(x2-x1))
 # @profile
 # TODO 緯度、経度が180を超えた場合の考慮が抜けている。（その場合には、マイナスにして計算する必要がある）
@@ -44,19 +44,37 @@ def get_simple_direction(lat1, lng1, lat2, lng2):
     lat2 = lat2 * math.pi / 180
     lng2 = lng2 * math.pi / 180
     atan = math.atan2(math.sin(lng2 - lng1), math.cos(lat1) * math.tan(lat2) - math.sin(lat1) * math.cos(lng2 - lng1))
-    return atan * 180 / math.pi # radianから角度に戻す
+    result = atan * 180 / math.pi # radianから角度に戻す
+    if result >= 0:
+        return result
+    else:
+        return 360 + result
+
+#
+# 地球を楕円体として計算した場合
+#
+# see: http://vldb.gsi.go.jp/sokuchi/surveycalc/surveycalc/bl2stf.html
+# see: http://vldb.gsi.go.jp/sokuchi/surveycalc/surveycalc/algorithm/bl2st/bl2st.htm
+#
+# 楕円体	GRS80
+# 出発点	緯度	北緯 36°00′00.0000″
+# 経度	東経 150°00′00.0000″
+# 到着点	緯度	北緯 44°00′00.0000″
+# 経度	東経 141°00′00.0000″
+
+# 測地線長	1,173,117.651(m)
+# 方位角	出発点→到着点	321°57′20.46″
+# 到着点→出発点	136°08′57.93″
 
 #
 # TODO 地球を楕円体として距離を求める
 #
-# see: http://vldb.gsi.go.jp/sokuchi/surveycalc/surveycalc/algorithm/bl2st/bl2st.htm
 def get_accurate_distance(lat1, lng1, lat2, lng2):
     pass
 
 #
 # TODO 地球を楕円体として方角を求める
 #
-# see: http://vldb.gsi.go.jp/sokuchi/surveycalc/surveycalc/algorithm/bl2st/bl2st.htm
 def get_acurate_direction(lat1, lng1, lat2, lng2):
     pass
 
@@ -67,5 +85,5 @@ if __name__ == '__main__':
     # print(timeit.timeit("get_simple_direction(36, 150, 44, 141)", number=100, setup="from __main__ import get_simple_direction"))
     distance = get_simple_distance(36, 150, 44, 141)
     direction = get_simple_direction(36, 150, 44, 141)
-    print "distance: {}".format(distance)
-    print "direction: {}".format(direction)
+    print "distance: {}".format(distance)   # distance: 1174.15250957
+    print "direction: {}".format(direction) # direction: 322.066953861
