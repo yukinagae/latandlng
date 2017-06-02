@@ -19,8 +19,12 @@ from math import sqrt
 from math import radians
 from math import degrees
 
-# setting
+# setting (GRS80)
 a = 6378137 # 長軸半径 (赤道半径)
+# f = 1/298.257223563 # 扁平率
+f = 1/298.257222101 # 扁平率
+# b = (1 - f) * a # 短軸半径 (極半径)
+b = 6356752.31414036
 
 # 2点の(緯度, 経度)から距離を計算する
 #
@@ -47,8 +51,7 @@ def simple(lat1, lng1, lat2, lng2):
     if α1 < 0:
         α1 = α1 + 360
     s = a * acos(sin(φ1) * sin(φ2) + cos(φ1) * cos(φ2) * cos(L))
-    print("distance: {}".format(s))
-    print("direction: {}".format(α1))
+    return s, α1
 
 #
 # 地球を楕円体として距離と方角を求める (WGS84 or GRS80)
@@ -62,14 +65,8 @@ def simple(lat1, lng1, lat2, lng2):
 def vincenty(lat1, lng1, lat2, lng2):
 
     if lat1 == lat2 and lng1 == lng2:
-        print("distance: {}".format(0))
-        print("direction: {}".format(0))
-        return
+        return 0, 0
 
-    # f = 1/298.257223563 # 扁平率
-    f = 1/298.257222101 # 扁平率
-    # b = (1 - f) * a # 短軸半径 (極半径)
-    b = 6356752.31414036
     φ1 = lat1 # 出発点の緯度
     L1 = lng1 # 出発点の経度
     φ2 = lat2 # 到着点の緯度
@@ -86,9 +83,7 @@ def vincenty(lat1, lng1, lat2, lng2):
     for n in range(0, 2000): # iterations
         sinσ = sqrt((cos(U2) * sin(λ)) ** 2 + (cos(U1) * sin(U2) - sin(U1) * cos(U2) * cos(λ)) ** 2)
         if sinσ == 0:
-            print("distance: {}".format(0))
-            print("direction: {}".format(0))
-            return
+            return 0, 0
         cosσ = sin(U1) * sin(U2) + cos(U1) * cos(U2) * cos(λ)
         σ = atan2(sinσ, cosσ) # 補助球上の弧の長さ
         sinα = (cos(U1) * cos(U2) * sin(λ)) / sinσ
@@ -108,27 +103,28 @@ def vincenty(lat1, lng1, lat2, lng2):
     A = 1 + u2 / 16384 * (4096 + u2 * (-768 + u2 * (320 - 175 * u2)))
     B = u2 / 1024 * (256 + u2 * (-128 + u2 * (74 - 47 * u2)))
     Δσ = B * sinσ * (cos_2σm_ + 1 / 4 * B * (cosσ * (-1 + 2 * (cos_2σm_ ** 2)) - 1 / 6 * B * cos_2σm_ * (-3 + 4 * (sinσ ** 2)) * (-3 + 4 * (cos_2σm_ ** 2))))
-    s = b * A * (σ - Δσ) # ２点間の距離
-    print("distance: {}".format(s))
+    s = b * A * (σ - Δσ) # 2点間の距離
     α1 = degrees(atan2(cos(U2) * sin(λ), cos(U1) * sin(U2) - sin(U1) * cos(U2) * cos(λ))) # 出発点の方位角
     if α1 < 0:
         α1 = α1 + 360
-    print("direction: {}".format(α1))
+    return s, α1
 
 # main
 if __name__ == '__main__':
-    # import timeit
-    # print(timeit.timeit("simple(36, 150, 44, 141)", number=100, setup="from __main__ import simple"))
-    # print(timeit.timeit("vincenty(36, 150, 44, 141)", number=100, setup="from __main__ import vincenty"))
-    simple(0, 0, 89, 0)
-    vincenty(0, 0, 89, 00)
-    simple(0, 0, -89, 0)
-    vincenty(0, 0, -89, 00)
-    simple(0, 0, 1, 179)
-    vincenty(0, 0, 1, 179)
-    simple(35.41, 139.41, 34.3, 118.14)
-    vincenty(35.41, 139.41, 34.3, 118.14)
-    simple(35.41, 139.41, 33.25, 70.35)
-    vincenty(35.41, 139.41, 33.25, 70.35)
-    simple(35.41, 139.41, 33.52, 151.12)
-    vincenty(35.41, 139.41, 33.52, 151.12)
+    import timeit
+    print(timeit.timeit("simple(36, 150, 44, 141)", number=100, setup="from __main__ import simple"))
+    print(timeit.timeit("vincenty(36, 150, 44, 141)", number=100, setup="from __main__ import vincenty"))
+    # distance, direction = simple(0, 0, 89, 0)
+    # distance, direction = vincenty(0, 0, 89, 00)
+    # distance, direction = simple(0, 0, -89, 0)
+    # distance, direction = vincenty(0, 0, -89, 00)
+    # distance, direction = simple(0, 0, 1, 179)
+    # distance, direction = vincenty(0, 0, 1, 179)
+    # distance, direction = simple(35.41, 139.41, 34.3, 118.14)
+    # distance, direction = vincenty(35.41, 139.41, 34.3, 118.14)
+    # distance, direction = simple(35.41, 139.41, 33.25, 70.35)
+    # vincenty(35.41, 139.41, 33.25, 70.35)
+    # distance, direction = simple(35.41, 139.41, 33.52, 151.12)
+    # distance, direction = vincenty(35.41, 139.41, 33.52, 151.12)
+    # print("distance: {}".format(distance))
+    # print("direction: {}".format(direction))
