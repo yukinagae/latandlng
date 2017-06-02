@@ -8,6 +8,13 @@
 # TODO • 計算方法を変えて精度や処理時間の違いを出力する
 
 import math
+from math import cos
+from math import sin
+from math import tan
+from math import acos
+from math import atan
+from math import fabs
+from math import sqrt
 from decimal import Decimal
 
 # 2点の(緯度, 経度)から距離を計算する
@@ -30,7 +37,7 @@ def get_simple_distance(lat1, lng1, lat2, lng2):
     lng1 = lng1 * math.pi / 180
     lat2 = lat2 * math.pi / 180
     lng2 = lng2 * math.pi / 180
-    return r * math.acos(math.sin(lat1) * math.sin(lat2) + math.cos(lat1) * math.cos(lat2) * math.cos(lng2 - lng1))
+    return r * math.acos(sin(lat1) * sin(lat2) + cos(lat1) * cos(lat2) * cos(lng2 - lng1))
 
 # 2点の(緯度, 経度)から方角を計算する(北=0)
 #
@@ -44,7 +51,7 @@ def get_simple_direction(lat1, lng1, lat2, lng2):
     lng1 = lng1 * math.pi / 180
     lat2 = lat2 * math.pi / 180
     lng2 = lng2 * math.pi / 180
-    atan = math.atan2(math.sin(lng2 - lng1), math.cos(lat1) * math.tan(lat2) - math.sin(lat1) * math.cos(lng2 - lng1))
+    atan = math.atan2(sin(lng2 - lng1), cos(lat1) * tan(lat2) - sin(lat1) * cos(lng2 - lng1))
     result = atan * 180 / math.pi # radianから角度に戻す
     if result >= 0:
         return result
@@ -71,30 +78,31 @@ def get_simple_direction(lat1, lng1, lat2, lng2):
 # TODO 地球を楕円体として距離を求める
 #
 def get_accurate_distance(lat1, lng1, lat2, lng2):
-    φ1 = lat1 # 出発点の緯度
-    L1 = lng1 # 出発点の経度
-    φ2 = lat2 # 到着点の緯度
-    L2 = lng2 # 到着点の経度
-    a = 6378137 # 長半径(m)
-    f = 1 / 298.257222101 # 扁平率
-    l = L2 - L1
-    ll = get_ll(l)
-    L = math.fabs(ll)
-    LL = 180 - L
-    Δ = get_Δ(φ1, φ2, ll)
-    Σ = φ1 + φ2
-    u1 = get_u1(φ1, φ2, ll, f)
-    u2= get_u2(φ1, φ2, ll, f)
-    ΣΣ = u1 + u2
-    ΔΔ = u2 - u1
-    ξ = math.cos(ΣΣ / 2)
-    ξξ = math.sin(ΣΣ / 2)
-    η = math.sin(ΔΔ / 2)
-    ηη = math.cos(ΔΔ / 2)
-    x = math.sin(u1) * math.sin(u2)
-    y = math.cos(u1) * math.cos(u2)
-    c = y * math.cos(L) + x
-    ε = (f * (2 - f)) / math.pow((1 - f), 2)
+    pass
+    # φ1 = lat1 # 出発点の緯度
+    # L1 = lng1 # 出発点の経度
+    # φ2 = lat2 # 到着点の緯度
+    # L2 = lng2 # 到着点の経度
+    # a = 6378137 # 長半径(m)
+    # f = 1 / 298.257222101 # 扁平率
+    # l = L2 - L1
+    # ll = get_ll(l)
+    # L = math.fabs(ll)
+    # LL = 180 - L
+    # Δ = get_Δ(φ1, φ2, ll)
+    # Σ = φ1 + φ2
+    # u1 = get_u1(φ1, φ2, ll, f)
+    # u2= get_u2(φ1, φ2, ll, f)
+    # ΣΣ = u1 + u2
+    # ΔΔ = u2 - u1
+    # ξ = math.cos(ΣΣ / 2)
+    # ξξ = math.sin(ΣΣ / 2)
+    # η = math.sin(ΔΔ / 2)
+    # ηη = math.cos(ΔΔ / 2)
+    # x = math.sin(u1) * math.sin(u2)
+    # y = math.cos(u1) * math.cos(u2)
+    # c = y * math.cos(L) + x
+    # ε = (f * (2 - f)) / math.pow((1 - f), 2)
     # main
     # n0 = ε *
 
@@ -115,15 +123,15 @@ def get_Δ(φ1, φ2, ll):
 
 def get_u1(φ1, φ2, ll, f):
     if ll >= 0:
-        return math.atan((1 - f) * Decimal(math.tan(φ1))) #
+        return atan((1 - f) * tan(φ1)) #
     else:
-        return math.atan((1 - f) * Decimal(math.tan(φ2)))
+        return atan((1 - f) * tan(φ2))
 
 def get_u2(φ1, φ2, ll, f):
     if ll >= 0:
-        return math.atan((1 - f) * Decimal(math.tan(φ2))) #
+        return atan((1 - f) * tan(φ2))
     else:
-        return math.atan((1 - f) * Decimal(math.tan(φ1)))
+        return atan((1 - f) * tan(φ1))
 
 def get_αα(α, L):
     if α < 180 and L > 0:
@@ -158,34 +166,33 @@ def adjust_bw_0_to_360(α1):
 # 東経を正、西経を負
 # とする。
 def get_acurate_direction(lat1, lng1, lat2, lng2):
-    φ1 = Decimal(lat1) # 出発点の緯度
-    L1 = Decimal(lng1) # 出発点の経度
-    φ2 = Decimal(lat2) # 到着点の緯度
-    L2 = Decimal(lng2) # 到着点の経度
-    a = Decimal(6378137) # 長半径(m)
-    f = Decimal(1 / 298.257222101) # 扁平率
+    φ1 = lat1 # 出発点の緯度
+    L1 = lng1 # 出発点の経度
+    φ2 = lat2 # 到着点の緯度
+    L2 = lng2 # 到着点の経度
+    a = 6378137 # 長半径(m)
+    f = 1 / 298.257222101 # 扁平率
     l = L2 - L1
     ll = get_ll(l)
-    print(ll)
-    L = Decimal(math.fabs(ll))
+    L = fabs(ll)
     LL = 180 - L
     Δ = get_Δ(φ1, φ2, ll)
     Σ = φ1 + φ2
-    u1 = Decimal(get_u1(φ1, φ2, ll, f))
-    u2 = Decimal(get_u2(φ1, φ2, ll, f))
+    u1 = get_u1(φ1, φ2, ll, f)
+    u2 = get_u2(φ1, φ2, ll, f)
     print(u1)
     print(u2)
     ΣΣ = u1 + u2
     ΔΔ = u2 - u1
     print(ΔΔ)
-    ξ = Decimal(math.cos(ΣΣ / 2))
-    ξξ = Decimal(math.sin(ΣΣ / 2))
-    η = Decimal(math.sin(ΔΔ / 2))
+    ξ = cos(ΣΣ / 2)
+    ξξ = sin(ΣΣ / 2)
+    η = sin(ΔΔ / 2)
     print(η)
-    ηη = Decimal(math.cos(ΔΔ / 2))
-    x = Decimal(math.sin(u1) * math.sin(u2))
-    y = Decimal(math.cos(u1) * math.cos(u2))
-    c = y * Decimal(math.cos(L)) + x
+    ηη = cos(ΔΔ / 2)
+    x = sin(u1) * sin(u2)
+    y = cos(u1) * cos(u2)
+    c = y * cos(L) + x
     ε = (f * (2 - f)) / ((1 - f) ** 2)
     print(ε)
 
@@ -193,7 +200,7 @@ def get_acurate_direction(lat1, lng1, lat2, lng2):
 
     if c >= 0: # zone 1
         print("zone 1")
-    elif 0 > c >= -(math.cos(3 * math.cos(u1))): # zone 2
+    elif 0 > c >= -(cos(3 * cos(u1))): # zone 2
         print("zone 2")
     else: # zone 3
         print("zone 3")
@@ -201,33 +208,33 @@ def get_acurate_direction(lat1, lng1, lat2, lng2):
     # zone 1
     θ = L * (1 + f * y)
     print("1st theta: {}".format(θ))
-    loss = Decimal(10) ** -15
+    loss = 10 ** -15
     print(loss)
     F = 1 # dummy loss first
-    while math.fabs(F) >= loss:
-    # for n in range(0, 14):
+    # while math.fabs(F) >= loss:
+    for n in range(0, 14):
         # print("########### n: {}".format(n))
         print("begin theta: {}".format(θ))
-        g = Decimal(math.sqrt((η ** 2) * (Decimal(math.cos(θ / 2)) ** 2) + (ξ ** 2) * (Decimal(math.sin(θ / 2)) ** 2)))
+        g = sqrt((η ** 2) * (cos(θ / 2) ** 2) + (ξ ** 2) * (sin(θ / 2) ** 2))
         print("g: {}".format(g))
-        h = Decimal(math.sqrt(math.pow(ηη, 2) * math.pow(math.cos(θ / 2), 2) + math.pow(ξξ, 2) * math.pow(math.sin(θ / 2), 2)))
+        h = sqrt((ηη ** 2) * (cos(θ / 2) ** 2) + (ξξ ** 2) * (sin(θ / 2) ** 2))
         print("h: {}".format(h))
-        σ = 2 * Decimal(math.atan(g / h))
+        σ = 2 * atan(g / h)
         J = 2 * g * h
         print("J: {}".format(J))
-        K = Decimal(math.pow(h, 2) - math.pow(g, 2))
-        γ = y * Decimal(math.sin(θ)) / J
+        K = h ** 2 - g ** 2
+        γ = y * sin(θ) / J
         print("y: {}".format(γ))
-        Γ = Decimal(1 - math.pow(γ, 2))
+        Γ = 1 - (γ ** 2)
         print("R: {}".format(Γ))
         ζ = Γ * K - 2 * x
         ζζ = ζ + x
-        D = Decimal(1/4) * f * (1 + f) - Decimal(3/16) * (f ** 2) * Γ
+        D = 1/4 * f * (1 + f) - 3/16 * (f ** 2) * Γ
         E = (1 - D * Γ) * f * γ * (σ + D * J * (ζ + D * K * ((2 * (ζ ** 2) - (Γ ** 2)))))
         print("E: {}".format(E))
         F = θ - L - E
         print("F: {}".format(F))
-        G = f * (γ ** 2) * (1 - 2 * D * Γ) + f * ζζ * (σ / J) * (1 - D * Γ + Decimal(1/2) * f * (γ ** 2)) + Decimal(1/4) * (f ** 2) * ζ * ζζ
+        G = f * (γ ** 2) * (1 - 2 * D * Γ) + f * ζζ * (σ / J) * (1 - D * Γ + 1/2 * f * (γ ** 2)) + 1/4 * (f ** 2) * ζ * ζζ
         print("(F / (1 - G)): {}".format((F / (1 - G))))
         print("G: {}".format(G))
         θ = θ - (F / (1 - G))
@@ -236,28 +243,26 @@ def get_acurate_direction(lat1, lng1, lat2, lng2):
     print(θ)
     print(η)
     print(ηη)
-    α = math.atan(ξ * Decimal(math.tan(θ / 2)) / η)
-    Δα_2 = math.atan(ξξ * Decimal(math.tan(θ / 2)) / ηη)
+    α = atan(ξ * tan(θ / 2) / η)
+    Δα_2 = atan(ξξ * tan(θ / 2) / ηη)
     αα = get_αα(α, L)
     αα1 = αα - Δα_2
     α2 = αα + Δα_2
     αα21 = 180 + α2
     α1 = get_α1(αα1, αα21, ll)
     α21 = get_α21(αα1, αα21, ll)
-    print(α1)
-    print(α21)
     α1 = adjust_bw_0_to_360(α1)
     α21 = adjust_bw_0_to_360(α21)
     print(α1)
-    print(α21)
+    # print(α21)
 
 
 # main
 if __name__ == '__main__':
-    import timeit
+    # import timeit
     # print(timeit.timeit("get_simple_distance(36, 150, 44, 141)", number=100, setup="from __main__ import get_simple_distance"))
     # print(timeit.timeit("get_simple_direction(36, 150, 44, 141)", number=100, setup="from __main__ import get_simple_direction"))
-    distance = get_accurate_distance(0, 0, 10, 100)
-    # direction = get_acurate_direction(0, 0, 10, 100)
+    # distance = get_accurate_distance(0, 0, 10, 20)
+    direction = get_acurate_direction(0, 0, 10, 20)
     # print "distance: {}".format(distance)   # distance: 1174.15250957
     print("direction: {}".format(direction)) # direction: 322.066953861
