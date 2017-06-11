@@ -1,10 +1,6 @@
 # README #
 
-TODO
-
-### What is this repository for? ###
-
-TODO
+緯度と経度から距離と方角を求める
 
 ### Setup ###
 

@@ -4,8 +4,6 @@
 #
 # 現在位置(緯度,経度)と目的地位置(緯度,経度)を与えると 2点間の直線距離と目的位置の方位角(北=0)を出力させるプログラム
 #
-# TODO • 出力するまでの時間を測る
-# TODO • 計算方法を変えて精度や処理時間の違いを出力する
 
 import math
 from math import cos
@@ -74,9 +72,6 @@ def vincenty(lat1, lng1, lat2, lng2):
     U1 = atan((1 - f) * tan(radians(φ1))) # 出発点の更成緯度 (補助球上の緯度)
     U2 = atan((1 - f) * tan(radians(φ2))) # 到着点の更成緯度 (補助球上の緯度)
     L = radians(L2 - L1) # 2点間の経度差
-    #λ1 # 出発点の補助球上の経度
-    #λ2 # 到着点の補助球上の経度
-    #α # 赤道上での方位角
     # Inverse problem
     loss = 10 ** -12
     λ = L
@@ -109,22 +104,84 @@ def vincenty(lat1, lng1, lat2, lng2):
         α1 = α1 + 360
     return s, α1
 
+#
+# 距離が近い場合の近似
+#
+# @profile
+def short_distance(lat1, lng1, lat2, lng2):
+    phi1 = radians(lat1)
+    L1 = radians(lng1)
+    phi2 = radians(lat2)
+    L2 = radians(lng2)
+    phi = phi2 - phi1
+    L = L2 - L1
+    s = a * sqrt((L) ** 2 + (phi) ** 2)
+    alpha1 = degrees(atan2(a * phi, a * L))
+    if 0 < alpha1 <= 90:
+        alpha1 = 90 - alpha1
+    elif -179 < alpha1 <= 0:
+        alpha1 = -alpha1 + 90
+    elif 90 < alpha1 < 180:
+        alpha1 = 360 - (90 - alpha1)
+    return s, alpha1
+
 # main
 if __name__ == '__main__':
     import timeit
-    print(timeit.timeit("simple(36, 150, 44, 141)", number=100, setup="from __main__ import simple"))
-    print(timeit.timeit("vincenty(36, 150, 44, 141)", number=100, setup="from __main__ import vincenty"))
+    print(timeit.timeit("simple(36, 150, 44, 141)",         number=100000, setup="from __main__ import simple"))
+    print(timeit.timeit("vincenty(36, 150, 44, 141)",       number=100000, setup="from __main__ import vincenty"))
+    print(timeit.timeit("short_distance(36, 150, 44, 141)", number=100000, setup="from __main__ import short_distance"))
     # distance, direction = simple(0, 0, 89, 0)
+    # print("distance: {}".format(distance))
+    # print("direction: {}".format(direction))
     # distance, direction = vincenty(0, 0, 89, 00)
+    # print("distance: {}".format(distance))
+    # print("direction: {}".format(direction))
+    # distance, direction = short_distance(0, 0, 89, 00)
+    # print("distance: {}".format(distance))
+    # print("direction: {}".format(direction))
     # distance, direction = simple(0, 0, -89, 0)
+    # print("distance: {}".format(distance))
+    # print("direction: {}".format(direction))
     # distance, direction = vincenty(0, 0, -89, 00)
+    # print("distance: {}".format(distance))
+    # print("direction: {}".format(direction))
+    # distance, direction = short_distance(0, 0, -89, 00)
+    # print("distance: {}".format(distance))
+    # print("direction: {}".format(direction))
     # distance, direction = simple(0, 0, 1, 179)
+    # print("distance: {}".format(distance))
+    # print("direction: {}".format(direction))
     # distance, direction = vincenty(0, 0, 1, 179)
+    # print("distance: {}".format(distance))
+    # print("direction: {}".format(direction))
+    # distance, direction = short_distance(0, 0, 1, 179)
+    # print("distance: {}".format(distance))
+    # print("direction: {}".format(direction))
     # distance, direction = simple(35.41, 139.41, 34.3, 118.14)
+    # print("distance: {}".format(distance))
+    # print("direction: {}".format(direction))
     # distance, direction = vincenty(35.41, 139.41, 34.3, 118.14)
+    # print("distance: {}".format(distance))
+    # print("direction: {}".format(direction))
+    # distance, direction = short_distance(35.41, 139.41, 34.3, 118.14)
+    # print("distance: {}".format(distance))
+    # print("direction: {}".format(direction))
     # distance, direction = simple(35.41, 139.41, 33.25, 70.35)
-    # vincenty(35.41, 139.41, 33.25, 70.35)
+    # print("distance: {}".format(distance))
+    # print("direction: {}".format(direction))
+    # distance, direction = vincenty(35.41, 139.41, 33.25, 70.35)
+    # print("distance: {}".format(distance))
+    # print("direction: {}".format(direction))
+    # distance, direction = short_distance(35.41, 139.41, 33.25, 70.35)
+    # print("distance: {}".format(distance))
+    # print("direction: {}".format(direction))
     # distance, direction = simple(35.41, 139.41, 33.52, 151.12)
+    # print("distance: {}".format(distance))
+    # print("direction: {}".format(direction))
     # distance, direction = vincenty(35.41, 139.41, 33.52, 151.12)
+    # print("distance: {}".format(distance))
+    # print("direction: {}".format(direction))
+    # distance, direction = short_distance(35.41, 139.41, 33.52, 151.12)
     # print("distance: {}".format(distance))
     # print("direction: {}".format(direction))
