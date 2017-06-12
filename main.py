@@ -5,7 +5,6 @@
 # 現在位置(緯度,経度)と目的地位置(緯度,経度)を与えると 2点間の直線距離と目的位置の方位角(北=0)を出力させるプログラム
 #
 
-import math
 from math import cos
 from math import sin
 from math import tan
