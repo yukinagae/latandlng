@@ -153,8 +153,14 @@ def difference(lat1, lng1, lat2, lng2):
 if __name__ == '__main__':
     import timeit
     # performance
+    print("#######################################################")
+    print("performance")
+    print("#######################################################")
+    print("[vincenty]")
     print(timeit.timeit("vincenty(36, 150, 44, 141)",       number=100000, setup="from __main__ import vincenty")) # 1.8238524299813434
+    print("[simple]")
     print(timeit.timeit("simple(36, 150, 44, 141)",         number=100000, setup="from __main__ import simple")) # 0.15921848092693835
+    print("[short distance]")
     print(timeit.timeit("short_distance(36, 150, 44, 141)", number=100000, setup="from __main__ import short_distance")) # 0.14479246700648218
     # 各計算方法による距離と方角の差異
     difference(0, 0, 89, 00)
